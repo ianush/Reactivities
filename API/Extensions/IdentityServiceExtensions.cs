@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Domain;
 using Persistence;
@@ -11,10 +5,12 @@ using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Infrastructure.Security;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Extensions
 {
-    public static class IdentityServerExtensions
+    public static class IdentityServiceExtensions
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
         {
@@ -35,6 +31,15 @@ namespace API.Extensions
                     ValidateAudience = false
                 };
             });
+
+            services.AddAuthorization(opt=> 
+            {
+                opt.AddPolicy("IsActivityHost", policy => 
+                {
+                    policy.Requirements.Add(new IsHostRequirement());
+                } );
+            });
+            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
             services.AddScoped<TokenService>();
 
             return services;
