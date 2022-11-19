@@ -24,7 +24,11 @@ export default observer(function ActivityListItemAttendee({
               as={Link}
               to={`/profiles/${attendee.username}`}
             >
-              <Image size="mini" circular src="/assets/user.png" />
+              <Image
+                size="mini"
+                circular
+                src={attendee?.image || 'assets/user.png'}
+              />
             </List.Item>
           }
         >
