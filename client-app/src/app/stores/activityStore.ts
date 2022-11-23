@@ -36,11 +36,8 @@ export default class ActivityStore {
 
   loadActivities = async () => {
     this.loadingInitial = true;
-
     try {
       const activities = await agent.Activities.list();
-      this.setLoadingInitial(true);
-
       activities.forEach(activity => {
         this.setActivity(activity);
       });
@@ -108,7 +105,9 @@ export default class ActivityStore {
       runInAction(() => {
         this.selectedActivity = newActivity;
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   updateActivity = async (activity: ActivityFormValues) => {
@@ -187,10 +186,23 @@ export default class ActivityStore {
         );
       });
     } catch (error) {
-      console.error();
+      console.log(error);
     } finally {
       runInAction(() => (this.loading = false));
     }
+  };
+
+  updateAttendeeFollowing = (username: string) => {
+    this.activityRegistry.forEach(activity => {
+      activity.attendees.forEach(attendee => {
+        if (attendee.username === username) {
+          attendee.following
+            ? attendee.followersCount--
+            : attendee.followersCount++;
+          attendee.following = !attendee.following;
+        }
+      });
+    });
   };
 
   clearSelectedActivity = () => {
